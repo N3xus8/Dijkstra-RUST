@@ -6,7 +6,7 @@ const WINDOWWIDTH: i32 = 800;
 const WINDOWHEIGHT: i32 =800;
 const INFINITY: i32 = 1_000_000_000;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 struct Point {
     x: i32,
     y: i32,
@@ -95,22 +95,10 @@ fn draw_grid(drawing:  &mut RaylibDrawHandle,location: Rectangle, world: &mut Gr
                 world.set_wall_at(j as i32, i as i32, !world.wall_at(j as i32, i as i32));
                 }
             }
-
-            for point in  &world.path {
-
-                let mut cell = Rectangle{
-                    x: location.x,
-                    y: location.y,
-                    width: cell.width,
-                    height: cell.height,
-
-                };
-
-                cell.x += point.x as f32 * cell_width;
-                cell.y += point.y as f32 * cell.height;
+ 
+            if point_in_path(world, point) {
                 drawing.draw_rectangle_lines_ex(cell, 5, Color::GOLD);
-
-                let text = format!("{}", distance_at(world, *point));
+                let text = format!("{}", distance_at(world, point));
                 drawing.draw_text(&text, cell.x  as i32 + 5 , cell.y as i32 + 5 , 25, Color::BEIGE);
 
             }
@@ -159,8 +147,6 @@ fn step_dijkstra( world: &mut GridWorld) {
 			if distance < distance_at(world, neighbour) {
 				set_distance_at(world, neighbour, distance)
 			}
-            // println!("After: d: {}, n: {}",distance, distance_at(world, neighbour));
-            // println!("distance at: {}", distance_at(world, Point { x: world.unvisited.get(&(4 as i32)).unwrap().x, y: world.unvisited.get(&(4 as i32)).unwrap().y})) ;
 
         }
     }
@@ -271,6 +257,10 @@ fn reconstruct_path(world: &mut GridWorld){
         world.path.push(world.current);
 
     }
+}
+
+fn point_in_path(world: &GridWorld, point: Point) -> bool {
+    world.path.contains(&point)
 }
 fn main() {
     let (mut raylb, thread) = raylib::init()
