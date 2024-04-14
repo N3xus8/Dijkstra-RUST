@@ -94,8 +94,18 @@ fn draw_grid(drawing:  &mut RaylibDrawHandle,location: Rectangle, world: &mut Gr
                 if drawing.is_mouse_button_pressed(MouseButton::MOUSE_LEFT_BUTTON){
                 world.set_wall_at(j as i32, i as i32, !world.wall_at(j as i32, i as i32));
                 }
+                if drawing.is_key_released(KeyboardKey::KEY_ONE) {
+                    world.start = point;
+                    reset_world(world)
+                }
+                // Change the position of the end point
+                if drawing.is_key_released(KeyboardKey::KEY_TWO)  {
+                    world.end = point;
+                    reset_world(world);
+                }    
             }
- 
+
+
             if point_in_path(world, point) {
                 drawing.draw_rectangle_lines_ex(cell, 5, Color::GOLD);
                 let text = format!("{}", distance_at(world, point));
@@ -260,6 +270,10 @@ fn reconstruct_path(world: &mut GridWorld){
 }
 
 fn point_in_path(world: &GridWorld, point: Point) -> bool {
+
+    if world.path.len() == 0 {
+        return false
+    }
     world.path.contains(&point)
 }
 fn main() {
